@@ -14,15 +14,28 @@
 // event controller
 
 // addition
-function addition(params) {
-    
+function addition(num1, num2) {
+    console.log("addition")
+    return num1 + num2;
 }
 
 // subtraction
+function subtraction(num1, num2) {
+    console.log("subtraction")
+    return num1 - num2;
+}
 
 // division
+function division(num1, num2) {
+    console.log("division")
+    return num1 / num2;
+}
 
 // multiplication
+function multiplication(num1, num2) {
+    console.log("multiplication")
+    return num1 * num2;
+}
 
 // event listener for submit button
         // Select the button element
@@ -30,5 +43,32 @@ function addition(params) {
 
         // Add an event listener to the button for a 'click' event
         button.addEventListener('click', function() {
-            alert('Button was clicked!');
+            var num1 = document.getElementById("value1").value;
+            var num2 = document.getElementById("value2").value;
+            var modifier = document.getElementById("modifier").value;
+            var answer;
+
+            switch (modifier) {
+                case "+":
+                    answer = addition(num1, num2);
+                    break;
+                case "-":
+                    answer = subtraction(num1, num2);
+                    
+                    break;
+                case "*":
+                    answer = multiplication(num1, num2);
+                    
+                    break;
+                case "/":
+                    answer = division(num1, num2);
+                    
+                    break;
+            
+                default:
+                    alert("that didn't work");
+                    break;
+            }
+
+            document.getElementById("answer").textContent=answer;
         });
