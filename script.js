@@ -1,3 +1,6 @@
+// Adam Sabet
+// SD 230
+// 
 // 3. Calculator
 // Create a program that functions as a calculator. 
 // The program stores each user input one at a time until an "=" sign is input. 
@@ -11,64 +14,189 @@
 // Values it must handle. 
 // [0,1,2,3,4,5,6,7,8,9,"+","-","/","*","="]
 
-// event controller
 
-// addition
-function addition(num1, num2) {
-    console.log("addition")
-    return num1 + num2;
-}
+///////////// GLOBAL VARIABLES ////////////
+var num1;
+var num2;
+var answer;
+var lastOp;
 
-// subtraction
-function subtraction(num1, num2) {
-    console.log("subtraction")
-    return num1 - num2;
-}
+///////////// EVENT LISTENERS ////////////
+// operator buttons
+$(".operator-key").on("click", function () {
+    let btnText = $(this).text();
+    // if (num1) {
+    //     math(btnText);
+    //     lastOp = btnText;
+    // } else {
+    //     lastOp = btnText;
+    // }
+    handleOperatorKey(btnText);
+});
 
-// division
-function division(num1, num2) {
-    console.log("division")
-    return num1 / num2;
-}
+// equals button
+$("#equals-btn").on("click", function () {
+    // let btnText = $(this).text();
+    math();
+});
 
-// multiplication
-function multiplication(num1, num2) {
-    console.log("multiplication")
-    return num1 * num2;
-}
+// ac button
+$("#ac-btn").on("click", function () {
+    // num1 = undefined;
+    // num2 = undefined;
+    // answer = undefined;
+    // lastOp = undefined;
+    // $("#display").html("");
+    // $("#list").empty();
+    clearCalculator();
+});
 
-// event listener for submit button
-        // Select the button element
-        const button = document.getElementById('equationButton');
+// number buttons
+$(".number").on("click", function () {
+    let btnText = $(this).text();
+    handleNumberKey(btnText);
+});
 
-        // Add an event listener to the button for a 'click' event
-        button.addEventListener('click', function() {
-            var num1 = document.getElementById("value1").value;
-            var num2 = document.getElementById("value2").value;
-            var modifier = document.getElementById("modifier").value;
-            var answer;
+// keyboard input
+$(document).on("keydown", function (event) {
+    const key = event.key;
 
-            switch (modifier) {
+    // Check if the key is a number (0-9)
+    if (!isNaN(key) || key == ".") {
+        handleNumberKey(key);
+    }
+
+    // Check if the key is an operator (+, -, *, /)
+    else if (["+", "-", "*", "/"].includes(key)) {
+        handleOperatorKey(key);
+    }
+
+    // Check if Enter or '=' is pressed to calculate the result
+    else if (key === "Enter" || key === "=") {
+        event.preventDefault();  // Prevent default Enter behavior 
+        math();
+    }
+
+    // Check if Escape (or 'AC' on the calculator) is pressed to clear
+    else if (key === "Escape") {
+        clearCalculator();
+    }
+
+    // Check if key is % or +/- for percentage and sign change
+    else if (key === "%") {
+        lastFunct = "%";
+        math();
+    } else if (key === "±") {
+        lastFunct = "+/-";
+        math();
+    }
+});
+
+////////////////// FUNCTIONS ///////////////////
+// Function to handle the math
+function math() {
+    // parse nums in case of string
+    num1 = num1 !== undefined ? parseFloat(num1) : 0;
+    num2 = num2 !== undefined ? parseFloat(num2) : 0;
+
+    if (num1) {
+        if (lastOp) {
+            switch (lastOp) {
                 case "+":
-                    answer = addition(num1, num2);
+                    answer = num2 + num1;
                     break;
                 case "-":
-                    answer = subtraction(num1, num2);
-                    
+                    answer = num2 - num1;
                     break;
-                case "*":
-                    answer = multiplication(num1, num2);
-                    
+                case "x":
+                    answer = num2 * num1;
                     break;
                 case "/":
-                    answer = division(num1, num2);
-                    
+                    answer = num2 / num1;
                     break;
-            
+                case "+/-":
+                    answer = -answer;
+                    break;
+                case "%":
+                    answer = answer / 100;
+                    break;
                 default:
-                    alert("that didn't work");
+                    console.log("that didn't work");
                     break;
             }
 
-            document.getElementById("answer").textContent=answer;
-        });
+            // round answer
+            answer = roundNum(answer);
+
+            // add equation to history
+            $("#list").prepend(`<p>${num2} ${lastOp} ${num1} = ${answer}</p>`)
+
+            // update stored numbers
+            num2 = answer;
+            num1 = undefined;
+        } else {
+            answer = num2;
+            num2 = num1;
+            num1 = undefined;
+        }
+    } else {
+        alert("You need to enter a value before using a function")
+    }
+
+}
+
+// Function to handle number key input
+function handleNumberKey(key) {
+    // Allow a decimal point entry
+    if (key === ".") {
+        if (!num1) {
+            num1 = "0.";  // Start with '0.' if num1 is undefined
+        } else if (!num1.toString().includes(".")) {
+            num1 = num1.toString() + ".";  // Append decimal if it doesn't already exist
+        }
+    } else {
+        // If key is a number, add it to num1
+        if (!num1 || num1 === "0") {
+            num1 = key;
+        } else {
+            num1 = num1.toString() + key;
+        }
+    }
+    $("#display").html(roundNum(num1));
+}
+
+// Function to handle operator key input
+function handleOperatorKey(key) {
+    if (num1) {
+        math(key);
+        lastOp = key;
+    } else {
+        lastOp = key;
+    }
+}
+
+// Function to clear calculator (mapped to AC button and Escape key)
+function clearCalculator() {
+    num1 = undefined;
+    num2 = undefined;
+    answer = undefined;
+    lastOp = undefined;
+    $("#display").html("");
+    $("#list").empty();
+}
+
+// round number if more than 4 decimals 
+function roundNum(value) {
+    // Ensure value is a float and check decimal length
+    let num = parseFloat(value);
+    if (isNaN(num)) return "0";  // Handle undefined or invalid numbers gracefully
+
+    // Check if the number has more than 4 decimal places
+    if (num.toString().includes('.') && num.toString().split('.')[1].length > 4) {
+        // Round to 4 decimal places if more than 4 decimals
+        return num.toFixed(4);
+    }
+
+    // Return number as-is if 4 or fewer decimals
+    return num.toString();
+}
