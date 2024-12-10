@@ -1,4 +1,27 @@
-/* CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background-color: #6eb5fc;
+  align-items: center;
+  align-content: center;
+  height: 100px;
+}
+
 .button,
 .display {
   align-items: center;
@@ -122,4 +145,17 @@
   content: "";
   display: table;
   clear: both;
+}
+
+.content {
+  flex: 1;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #6eb5fc;
+  font-size: 14px;
+  position: relative;
+  /* Adjust for sticky footer */
 }
