@@ -1,4 +1,4 @@
-# Rock Paper Scissors Game
+# Simple Calculator
 
 Welcome to my **Calculator** repository! This project is a simple calculator. 
 
